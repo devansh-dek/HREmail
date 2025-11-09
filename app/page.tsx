@@ -1,6 +1,5 @@
 "use client";
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 
 type FormState = {
   name: string;
@@ -31,14 +30,24 @@ export default function Home() {
     if (!form.name.trim() || !form.company.trim() || !form.email.trim()) {
       return "Please provide recipient name, company and email.";
     }
-    // Basic email check
     const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRe.test(form.email)) return "Please enter a valid email address.";
+    if (form.poc1Name.trim() && !form.poc1Phone.trim()) {
+      return "Please provide a phone number for POC 1.";
+    }
+    if (form.poc2Name.trim() && !form.poc2Phone.trim()) {
+      return "Please provide a phone number for POC 2.";
+    }
+    if (!form.poc1Name.trim() && form.poc1Phone.trim()) {
+      return "Please provide a name for POC 1.";
+    }
+    if (!form.poc2Name.trim() && form.poc2Phone.trim()) {
+      return "Please provide a name for POC 2.";
+    }
     return null;
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setSuccess(null);
     setError(null);
 
@@ -50,7 +59,6 @@ export default function Home() {
 
     setLoading(true);
 
-    // Map client field `company` to server expected `companyName`.
     const payload = { ...form, companyName: form.company };
 
     try {
@@ -60,7 +68,6 @@ export default function Home() {
         body: JSON.stringify(payload),
       });
 
-      // Await JSON safely
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
@@ -78,149 +85,233 @@ export default function Home() {
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white via-gray-50 to-gray-100 p-6">
-      <div className="max-w-3xl w-full bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden">
-        <div className="flex items-center gap-4 p-6 bg-white">
-          <img
-src="https://res.cloudinary.com/shubh39/image/upload/v1741670080/ewbfrw8yxdbfzhgdegvn.png"
-            alt="IIIT Ranchi Logo"
-            className="w-16 h-16 object-contain rounded"
-          />
+  const handleReset = () => {
+    setForm({ name: "", company: "", email: "", poc1Name: "", poc1Phone: "", poc2Name: "", poc2Phone: "" });
+    setError(null);
+    setSuccess(null);
+  };
 
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-800">IIIT Ranchi — Placement Mailer</h1>
-            <p className="text-sm text-slate-500 mt-1">Send a formal invitation email to companies for campus placements.</p>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
+      <div className="container mx-auto px-4 py-12 max-w-4xl">
+        {/* Header Section */}
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-6">
+            <div className="bg-white p-4 rounded-2xl shadow-lg border border-slate-200">
+              <img
+                src="https://res.cloudinary.com/shubh39/image/upload/v1741670080/ewbfrw8yxdbfzhgdegvn.png"
+                alt="IIIT Ranchi"
+                className="w-20 h-20 object-contain"
+              />
+            </div>
+          </div>
+          <h1 className="text-4xl font-bold text-slate-900 mb-3">
+            Placement Communication Portal
+          </h1>
+          <p className="text-slate-600 text-lg">
+            Indian Institute of Information Technology, Ranchi
+          </p>
+          <div className="w-24 h-1 bg-blue-600 mx-auto mt-4 rounded-full"></div>
+        </div>
+
+        {/* Main Form Card */}
+        <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
+            <h2 className="text-2xl font-semibold text-white">
+              Corporate Invitation Form
+            </h2>
+            <p className="text-blue-100 mt-1 text-sm">
+              Send formal placement invitations to recruiting organizations
+            </p>
+          </div>
+
+          <div className="p-8">
+            {/* Recipient Information */}
+            <div className="mb-8">
+              <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-4 flex items-center gap-2">
+                <span className="w-1 h-4 bg-blue-600 rounded"></span>
+                Recipient Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Recipient Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="John Doe"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-slate-50 hover:bg-white text-slate-800 placeholder-slate-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Company Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Acme Corporation"
+                    value={form.company}
+                    onChange={(e) => setForm({ ...form, company: e.target.value })}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-slate-50 hover:bg-white text-slate-800 placeholder-slate-400"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Email Address <span className="text-red-500">*</span>
+                </label>
+                  <input
+                    type="email"
+                    placeholder="hr@company.com"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-slate-50 hover:bg-white text-slate-800 placeholder-slate-400"
+                  />
+              </div>
+            </div>
+
+            {/* Point of Contact Section */}
+            <div className="mb-8">
+              <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-4 flex items-center gap-2">
+                <span className="w-1 h-4 bg-blue-600 rounded"></span>
+                Points of Contact (Optional)
+              </h3>
+
+              {/* POC 1 */}
+              <div className="bg-slate-50 rounded-lg p-6 mb-4 border border-slate-200">
+                <p className="text-xs font-semibold text-slate-500 uppercase mb-3">Primary Contact</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Contact Person"
+                      value={form.poc1Name}
+                      onChange={(e) => setForm({ ...form, poc1Name: e.target.value })}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-white text-slate-800 placeholder-slate-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Phone Number {form.poc1Name.trim() && <span className="text-red-500">*</span>}
+                    </label>
+                    <input
+                      type="tel"
+                      placeholder="+91 98765 43210"
+                      value={form.poc1Phone}
+                      onChange={(e) => setForm({ ...form, poc1Phone: e.target.value })}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-white text-slate-800 placeholder-slate-400"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* POC 2 */}
+              <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
+                <p className="text-xs font-semibold text-slate-500 uppercase mb-3">Secondary Contact</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Contact Person"
+                      value={form.poc2Name}
+                      onChange={(e) => setForm({ ...form, poc2Name: e.target.value })}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-white text-slate-800 placeholder-slate-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Phone Number {form.poc2Name.trim() && <span className="text-red-500">*</span>}
+                    </label>
+                    <input
+                      type="tel"
+                      placeholder="+91 98765 43210"
+                      value={form.poc2Phone}
+                      onChange={(e) => setForm({ ...form, poc2Phone: e.target.value })}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-white text-slate-800 placeholder-slate-400"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Status Messages */}
+            {error && (
+              <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+                <svg className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                <div>
+                  <p className="text-sm font-medium text-red-800">{error}</p>
+                </div>
+              </div>
+            )}
+
+            {success && (
+              <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
+                <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <div>
+                  <p className="text-sm font-medium text-green-800">{success}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-between pt-6 border-t border-slate-200">
+              <button
+                type="button"
+                onClick={handleReset}
+                className="px-6 py-3 text-slate-700 font-medium rounded-lg hover:bg-slate-100 transition-colors"
+              >
+                Reset Form
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={loading}
+                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-blue-500/30 flex items-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span>Send Invitation</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-500 text-center mt-6">
+              Please note: Email delivery may take a few moments. Kindly wait for confirmation.
+            </p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 grid grid-cols-1 gap-4">
-          <div className="grid grid-cols-2 gap-4">
-            <label className="flex flex-col">
-              <span className="text-sm font-medium text-slate-700">Recipient Name *</span>
-              <input
-                className="mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-sky-400"
-                type="text"
-                placeholder="e.g. John Doe"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                required
-              />
-            </label>
-
-            <label className="flex flex-col">
-              <span className="text-sm font-medium text-slate-700">Company Name *</span>
-              <input
-                className="mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-sky-400"
-                type="text"
-                placeholder="e.g. Acme Corp"
-                value={form.company}
-                onChange={(e) => setForm({ ...form, company: e.target.value })}
-                required
-              />
-            </label>
-          </div>
-
-          <label className="flex flex-col">
-            <span className="text-sm font-medium text-slate-700">Recipient Email *</span>
-            <input
-              className="mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-sky-400"
-              type="email"
-              placeholder="recipient@company.com"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              required
-            />
-          </label>
-
-          <div className="grid grid-cols-2 gap-4">
-            <label className="flex flex-col">
-              <span className="text-sm font-medium text-slate-700">POC 1 Name</span>
-              <input
-                className="mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-sky-400"
-                type="text"
-                placeholder="Optional"
-                value={form.poc1Name}
-                onChange={(e) => setForm({ ...form, poc1Name: e.target.value })}
-              />
-            </label>
-
-            <label className="flex flex-col">
-              <span className="text-sm font-medium text-slate-700">POC 1 Phone</span>
-              <input
-                className="mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-sky-400"
-                type="tel"
-                placeholder="+91 98765 43210"
-                value={form.poc1Phone}
-                onChange={(e) => setForm({ ...form, poc1Phone: e.target.value })}
-              />
-            </label>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <label className="flex flex-col">
-              <span className="text-sm font-medium text-slate-700">POC 2 Name</span>
-              <input
-                className="mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-sky-400"
-                type="text"
-                placeholder="Optional"
-                value={form.poc2Name}
-                onChange={(e) => setForm({ ...form, poc2Name: e.target.value })}
-              />
-            </label>
-
-            <label className="flex flex-col">
-              <span className="text-sm font-medium text-slate-700">POC 2 Phone</span>
-              <input
-                className="mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-sky-400"
-                type="tel"
-                placeholder="+91 98765 43210"
-                value={form.poc2Phone}
-                onChange={(e) => setForm({ ...form, poc2Phone: e.target.value })}
-              />
-            </label>
-          </div>
-
-          <div className="flex items-center gap-3 mt-2">
-            <button
-              type="submit"
-              disabled={loading}
-              className="inline-flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white px-4 py-2 rounded-md"
-            >
-              {loading ? (
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z" />
-                </svg>
-              ) : null}
-              <span>{loading ? "Sending..." : "Send Email"}</span>
-            </button>
-
-            <button
-              type="button"
-              className="text-sm text-slate-600 underline"
-              onClick={() => {
-                setForm({ name: "", company: "", email: "", poc1Name: "", poc1Phone: "", poc2Name: "", poc2Phone: "" });
-                setError(null);
-                setSuccess(null);
-              }}
-            >
-              Reset
-            </button>
-          </div>
-
-          {error ? (
-            <div className="mt-2 text-sm text-red-700 font-medium">{error}</div>
-          ) : null}
-
-          {success ? (
-            <div className="mt-2 text-sm text-green-700 font-medium">{success}</div>
-          ) : null}
-
-          <div className="mt-4 text-xs text-slate-500">
-            Note: Ensure SMTP credentials are provided in environment variables on the server (EMAIL_ADDRESS, EMAIL_PASSWORD). For Gmail, use an app password or OAuth.
-          </div>
-        </form>
+        {/* Footer */}
+        <div className="text-center mt-8 text-sm text-slate-500">
+          <p>Training & Placement Cell, IIIT Ranchi</p>
+        </div>
       </div>
     </div>
   );
