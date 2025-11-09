@@ -83,10 +83,11 @@ export default function Home() {
       <div className="max-w-3xl w-full bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden">
         <div className="flex items-center gap-4 p-6 bg-white">
           <img
-            src="/logo192.png"
-            alt="Institute Logo"
+src="https://res.cloudinary.com/shubh39/image/upload/v1741670080/ewbfrw8yxdbfzhgdegvn.png"
+            alt="IIIT Ranchi Logo"
             className="w-16 h-16 object-contain rounded"
           />
+
           <div>
             <h1 className="text-2xl font-semibold text-slate-800">IIIT Ranchi — Placement Mailer</h1>
             <p className="text-sm text-slate-500 mt-1">Send a formal invitation email to companies for campus placements.</p>
