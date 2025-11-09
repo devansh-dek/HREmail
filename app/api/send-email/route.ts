@@ -1,3 +1,4 @@
+// @ts-ignore: no declaration file for 'nodemailer' in this project
 import nodemailer from "nodemailer";
 
 // HTML escaping function
@@ -79,13 +80,21 @@ export async function POST(req: Request) {
       );
     }
 
+    const smtpPort = Number(process.env.SMTP_PORT) || 587;
+    // Trim credentials to avoid hidden whitespace mistakes
+    const smtpUser = process.env.EMAIL_ADDRESS?.toString().trim();
+    const smtpPass = process.env.EMAIL_PASSWORD?.toString().trim();
+
+    // Masked debug log for local troubleshooting — do NOT commit secrets
+    console.debug("SMTP user configured:", smtpUser ? `${smtpUser.slice(0, 3)}***` : "(not set)");
+
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_SERVER || "smtp.gmail.com",
-      port: Number(process.env.SMTP_PORT) || 587,
-      secure: false,
+      port: smtpPort,
+      secure: smtpPort === 465, // true for 465, false for other ports (STARTTLS uses 587)
       auth: {
-        user: process.env.EMAIL_ADDRESS,
-        pass: process.env.EMAIL_PASSWORD,
+        user: smtpUser,
+        pass: smtpPass,
       },
     });
 
