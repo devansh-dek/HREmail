@@ -25,6 +25,16 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
+
+  // available student contacts to optionally CC (show first names)
+  const studentContacts: { email: string; name: string }[] = [
+    { email: "bhumika.2023ug3002@iiitranchi.ac.in", name: "Bhumika" },
+    { email: "atharv.2023ug3019@iiitranchi.ac.in", name: "Atharv" },
+    { email: "abhinav@iiitranchi.ac.in", name: "Abhinav" },
+    { email: "devansh.2023ug1058@iiitranchi.ac.in", name: "Devansh" },
+    { email: "aman.2023ug1047@iiitranchi.ac.in", name: "Aman" },
+  ];
 
   const validate = () => {
     if (!form.name.trim() || !form.company.trim() || !form.email.trim()) {
@@ -59,7 +69,10 @@ export default function Home() {
 
     setLoading(true);
 
-    const payload = { ...form, companyName: form.company };
+  // create a payload type-safe object
+  const payload: any = { ...form, companyName: form.company };
+  // include any selected student contacts to CC
+  if (selectedContacts.length) payload.selectedContacts = selectedContacts;
 
     try {
       const res = await fetch("/api/send-email", {
@@ -241,6 +254,31 @@ export default function Home() {
                     />
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Optional Student CCs */}
+            <div className="mb-6">
+              <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-3">Optional CC — Student Contacts</h3>
+              <p className="text-xs text-slate-500 mb-3">Select any students to CC in the mail (you can select multiple).</p>
+              <div className="flex flex-wrap gap-3">
+                {studentContacts.map((c) => {
+                  const checked = selectedContacts.includes(c.email);
+                  return (
+                    <label key={c.email} className="inline-flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => {
+                          if (checked) setSelectedContacts(selectedContacts.filter((s) => s !== c.email));
+                          else setSelectedContacts([...selectedContacts, c.email]);
+                        }}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-slate-700">{c.name}</span>
+                    </label>
+                  );
+                })}
               </div>
             </div>
 

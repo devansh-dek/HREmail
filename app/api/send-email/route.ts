@@ -54,8 +54,8 @@ function createEmailBody(name: string, companyName: string,finalPOC1Name: string
 
     <p>If you need any assistance or information, please reach out to our student coordinators. We'd be more than happy to assist.</p>
 
-<p><strong>${escapeHtml(finalPOC1Name)}</strong> - ${escapeHtml(finalPOC1Phone)}<br>
-<strong>${escapeHtml(finalPOC2Name)}</strong> - ${escapeHtml(finalPOC2Phone)}</p>
+    <p><strong>${escapeHtml(finalPOC1Name)}</strong> - ${escapeHtml(finalPOC1Phone)}<br>
+    <strong>${escapeHtml(finalPOC2Name)}</strong> - ${escapeHtml(finalPOC2Phone)}</p>
 
     <div style="font-family: Arial, sans-serif; max-width: 500px; color: #333333;">
   <p style="margin-bottom: 15px; font-weight: bold;">Thanks & regards,</p>
@@ -100,6 +100,7 @@ export async function POST(req: Request) {
       poc1Phone,
       poc2Name,
       poc2Phone,
+      selectedContacts,
     } = rawBody as any;
 
     const companyName = (companyNameFromBody || company || "").toString().trim();
@@ -108,8 +109,8 @@ export async function POST(req: Request) {
     const finalPOC1Name = (poc1Name?.toString().trim()) || "Akshat Kumar";
     const finalPOC1Phone = (poc1Phone?.toString().trim()) || "+91 8498972554";
 
-    const finalPOC2Name = (poc2Name?.toString().trim()) || "Shubh Shubhanjal";
-    const finalPOC2Phone = (poc2Phone?.toString().trim()) || "+91 9508112887";
+    const finalPOC2Name = (poc2Name?.toString().trim()) || "Atharv Mittal";
+    const finalPOC2Phone = (poc2Phone?.toString().trim()) || "+91 8299027502";
 
     if (!email || !companyName || !name) {
       return new Response(
@@ -151,11 +152,18 @@ export async function POST(req: Request) {
       );
     }
 
+    // Build CC list: always include TPC in-charge and any selected student contacts
+    const defaultCc = ["incharge.tpc@iiitranchi.ac.in"];
+    const extraCc = Array.isArray(selectedContacts)
+      ? selectedContacts.map((s: any) => String(s).trim()).filter((s: string) => s)
+      : [];
+    const ccList = Array.from(new Set([...defaultCc, ...extraCc]));
+
     await transporter.sendMail({
       from: `"IIIT Ranchi - Placement" <${process.env.EMAIL_ADDRESS}>`,
       to: email,
-      subject:
-        "Invitation to Participate in IIIT Ranchi's 2025-26 Campus Placement Drive",
+      cc: ccList,
+      subject: "Invitation to Participate in IIIT Ranchi's 2025-26 Campus Placement Drive",
       html: createEmailBody(name, companyName, finalPOC1Name, finalPOC1Phone, finalPOC2Name, finalPOC2Phone),
     });
 
