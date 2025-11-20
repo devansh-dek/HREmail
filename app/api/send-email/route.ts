@@ -101,6 +101,10 @@ export async function POST(req: Request) {
       poc2Name,
       poc2Phone,
       selectedContacts,
+      template,
+      previousInteraction,
+      alumnusName,
+      roleName,
     } = rawBody as any;
 
     const companyName = (companyNameFromBody || company || "").toString().trim();
@@ -159,12 +163,38 @@ export async function POST(req: Request) {
       : [];
     const ccList = Array.from(new Set([...defaultCc, ...extraCc]));
 
+    // Build subject and html based on selected template
+    const tpl = (template || "normal").toString();
+    let subject = "Invitation to Participate in IIIT Ranchi's 2025-26 Campus Placement Drive";
+    let htmlBody = createEmailBody(name, companyName, finalPOC1Name, finalPOC1Phone, finalPOC2Name, finalPOC2Phone);
+
+    if (tpl === "followup") {
+      subject = `Following up on our discussion: IIIT Ranchi Placement Drive 2025-26`;
+      const ctx = previousInteraction ? ` ${escapeHtml(previousInteraction)}` : "";
+      htmlBody = `<p>It was a pleasure speaking with you${ctx}.</p>\n` + htmlBody;
+    } else if (tpl === "reengage") {
+      subject = `Continuing our Partnership: IIIT Ranchi Placement Drive 2025-26 & ${companyName}`;
+      htmlBody = `<p>We have had the privilege of collaborating with <strong>${escapeHtml(companyName)}</strong> for our past placement drives, and we would be delighted to continue this relationship.</p>\n` + htmlBody;
+    } else if (tpl === "alumnus") {
+      subject = `IIIT Ranchi TAP Coordinator - Request for ${companyName} Partnership`;
+      const alumnus = alumnusName ? escapeHtml(alumnusName) : "An alumnus";
+      htmlBody = `<p>My name is ${alumnus}, and I'm a TAP Coordinator at IIIT Ranchi. As an alumnus of the institute, we were hoping you could help connect us to the right recruiting team at <strong>${escapeHtml(companyName)}</strong>.</p>\n` + htmlBody;
+    } else if (tpl === "role") {
+      const role = roleName ? escapeHtml(roleName) : "the role";
+      subject = `IIIT Ranchi - Strong Candidates for your ${role} Opening`;
+      htmlBody = `<p>I noticed that <strong>${escapeHtml(companyName)}</strong> is hiring for <strong>${role}</strong>. We have students who are an excellent match and can be considered for this opening.</p>\n` + htmlBody;
+    } else if (tpl === "linkedin") {
+      const ctx = previousInteraction ? ` ${escapeHtml(previousInteraction)}` : "";
+      subject = `Following up on our LinkedIn conversation: IIIT Ranchi Placement Drive 2025-26`;
+      htmlBody = `<p>Following up on our LinkedIn conversation${ctx}.</p>\n` + htmlBody;
+    }
+
     await transporter.sendMail({
       from: `"IIIT Ranchi - Placement" <${process.env.EMAIL_ADDRESS}>`,
       to: email,
       cc: ccList,
-      subject: "Invitation to Participate in IIIT Ranchi's 2025-26 Campus Placement Drive",
-      html: createEmailBody(name, companyName, finalPOC1Name, finalPOC1Phone, finalPOC2Name, finalPOC2Phone),
+      subject,
+      html: htmlBody,
     });
 
     return new Response(

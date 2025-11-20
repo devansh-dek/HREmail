@@ -35,6 +35,20 @@ export default function Home() {
     { email: "devansh.2023ug1058@iiitranchi.ac.in", name: "Devansh" },
     { email: "aman.2023ug1047@iiitranchi.ac.in", name: "Aman" },
   ];
+  const templates = [
+    { id: "normal", label: "Normal Invitation (default)" },
+    { id: "followup", label: "Template 1: Follow-up After a Prior Conversation" },
+    { id: "reengage", label: "Template 2: Re-engaging a Past Recruiter" },
+    { id: "alumnus", label: "Template 3: Cold Outreach via an Alumnus" },
+    { id: "role", label: "Template 4: Proactive Outreach for a Specific Role" },
+    { id: "linkedin", label: "Template 5: LinkedIn follow-up" },
+  ];
+
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("normal");
+  // extra fields used by templates
+  const [previousInteraction, setPreviousInteraction] = useState(""); // for followup
+  const [alumnusName, setAlumnusName] = useState(""); // for alumnus template
+  const [roleName, setRoleName] = useState(""); // for role template
 
   const validate = () => {
     if (!form.name.trim() || !form.company.trim() || !form.email.trim()) {
@@ -70,9 +84,13 @@ export default function Home() {
     setLoading(true);
 
   // create a payload type-safe object
-  const payload: any = { ...form, companyName: form.company };
+  const payload: any = { ...form, companyName: form.company, template: selectedTemplate };
   // include any selected student contacts to CC
   if (selectedContacts.length) payload.selectedContacts = selectedContacts;
+  // include template-specific extras
+  if (selectedTemplate === "followup") payload.previousInteraction = previousInteraction;
+  if (selectedTemplate === "alumnus") payload.alumnusName = alumnusName;
+  if (selectedTemplate === "role") payload.roleName = roleName;
 
     try {
       const res = await fetch("/api/send-email", {
@@ -281,6 +299,42 @@ export default function Home() {
                 })}
               </div>
             </div>
+
+            {/* Template selector */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-slate-700 mb-2">Email Template</label>
+              <select
+                value={selectedTemplate}
+                onChange={(e) => setSelectedTemplate(e.target.value)}
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white text-slate-800"
+              >
+                {templates.map((t) => (
+                  <option key={t.id} value={t.id}>{t.label}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* conditional template fields */}
+            {selectedTemplate === "followup" && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-slate-700 mb-2">Context of prior conversation (e.g., "at ABC Summit / last week")</label>
+                <input value={previousInteraction} onChange={(e) => setPreviousInteraction(e.target.value)} placeholder="e.g. last week at ABC Tech Summit" className="w-full px-4 py-3 border rounded-lg" />
+              </div>
+            )}
+
+            {selectedTemplate === "alumnus" && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-slate-700 mb-2">Alumnus Name</label>
+                <input value={alumnusName} onChange={(e) => setAlumnusName(e.target.value)} placeholder="Alumnus Full Name" className="w-full px-4 py-3 border rounded-lg" />
+              </div>
+            )}
+
+            {selectedTemplate === "role" && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-slate-700 mb-2">Role / Job Title (e.g., SDE-1)</label>
+                <input value={roleName} onChange={(e) => setRoleName(e.target.value)} placeholder="e.g. SDE-1" className="w-full px-4 py-3 border rounded-lg" />
+              </div>
+            )}
 
             {/* Status Messages */}
             {error && (
