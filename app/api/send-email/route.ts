@@ -110,8 +110,8 @@ export async function POST(req: Request) {
     const companyName = (companyNameFromBody || company || "").toString().trim();
 
     // Fallback to defaults if empty
-    const finalPOC1Name = (poc1Name?.toString().trim()) || "Akshat Kumar";
-    const finalPOC1Phone = (poc1Phone?.toString().trim()) || "+91 8498972554";
+    const finalPOC1Name = (poc1Name?.toString().trim()) || "Rishabh Raj";
+    const finalPOC1Phone = (poc1Phone?.toString().trim()) || "+91 7782958750";
 
     const finalPOC2Name = (poc2Name?.toString().trim()) || "Atharv Mittal";
     const finalPOC2Phone = (poc2Phone?.toString().trim()) || "+91 8299027502";
