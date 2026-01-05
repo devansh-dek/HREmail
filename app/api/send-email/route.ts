@@ -81,9 +81,6 @@ function createEmailBody(name: string, companyName: string,finalPOC1Name: string
   </div>
 </div>
     `;
-
-
-
 }
 
 export async function POST(req: Request) {
@@ -204,7 +201,9 @@ export async function POST(req: Request) {
       }),
       { status: 200 }
     );
+
   } catch (error: any) {
+
     console.error("Email Error:", error);
     return new Response(
       JSON.stringify({
@@ -213,5 +212,6 @@ export async function POST(req: Request) {
       }),
       { status: 500 }
     );
+
   }
 }

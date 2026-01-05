@@ -31,7 +31,7 @@ export default function Home() {
   const studentContacts: { email: string; name: string }[] = [
     { email: "bhumika.2023ug3002@iiitranchi.ac.in", name: "Bhumika" },
     { email: "atharv.2023ug3019@iiitranchi.ac.in", name: "Atharv" },
-    { email: "abhinav@iiitranchi.ac.in", name: "Abhinav" },
+    { email: "abhinav.2023ug2075@iiitranchi.ac.in", name: "Abhinav" },
     { email: "devansh.2023ug1058@iiitranchi.ac.in", name: "Devansh" },
     { email: "aman.2023ug1047@iiitranchi.ac.in", name: "Aman" },
   ];
