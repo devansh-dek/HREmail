@@ -186,12 +186,21 @@ export async function POST(req: Request) {
       htmlBody = `<p>Following up on our LinkedIn conversation${ctx}.</p>\n` + htmlBody;
     }
 
+    // Generate unique Message-ID to prevent email threading
+    const timestamp = Date.now();
+    const randomString = Math.random().toString(36).substring(2, 15);
+    const messageId = `<${timestamp}.${randomString}@iiitranchi.ac.in>`;
+
     await transporter.sendMail({
       from: `"IIIT Ranchi - Placement" <${process.env.EMAIL_ADDRESS}>`,
       to: email,
       cc: ccList,
       subject,
       html: htmlBody,
+      headers: {
+        'Message-ID': messageId,
+        'X-Entity-Ref-ID': messageId,
+      },
     });
 
     return new Response(
