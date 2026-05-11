@@ -10,7 +10,23 @@ function escapeRegex(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function serializeRecord(record: any) {
+type HistoryRecord = {
+  _id: unknown;
+  status?: unknown;
+  recipientName?: unknown;
+  companyName?: unknown;
+  email?: unknown;
+  template?: unknown;
+  subject?: unknown;
+  cc?: unknown;
+  messageId?: unknown;
+  errorMessage?: unknown;
+  createdAt?: unknown;
+  sentAt?: unknown;
+  updatedAt?: unknown;
+};
+
+function serializeRecord(record: HistoryRecord) {
   return {
     id: record._id instanceof ObjectId ? record._id.toString() : toSafeString(record._id),
     status: toSafeString(record.status || "sent"),
@@ -36,12 +52,12 @@ export async function GET(request: NextRequest) {
 
     const query = searchParams.get("q")?.trim() || "";
     const template = searchParams.get("template")?.trim() || "all";
-    const status = searchParams.get("status")?.trim() || "all";
     const ccFilters = searchParams
       .getAll("cc")
       .flatMap((value) => value.split(","))
       .map((value) => value.trim())
       .filter(Boolean);
+    const olderThanMonth = searchParams.get("olderThanMonth") === "1";
     const sort = searchParams.get("sort")?.trim() === "asc" ? 1 : -1;
     const limit = Math.min(Number(searchParams.get("limit")) || 200, 500);
 
@@ -51,13 +67,17 @@ export async function GET(request: NextRequest) {
       mongoQuery.template = template;
     }
 
-    if (status && status !== "all") {
-      mongoQuery.status = status;
-    }
-
     if (ccFilters.length) {
       mongoQuery.cc = {
         $in: ccFilters,
+      };
+    }
+
+    if (olderThanMonth) {
+      const cutoff = new Date();
+      cutoff.setMonth(cutoff.getMonth() - 1);
+      mongoQuery.createdAt = {
+        $lt: cutoff,
       };
     }
 
@@ -84,11 +104,12 @@ export async function GET(request: NextRequest) {
     return Response.json({
       items: records.map(serializeRecord),
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
     return Response.json(
       {
         error: "Failed to load mail history",
-        details: error?.message || String(error),
+        details: message,
       },
       { status: 500 }
     );

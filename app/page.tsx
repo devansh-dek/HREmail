@@ -128,14 +128,7 @@ export default function Home() {
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         {/* Header Section */}
         <div className="text-center mb-8">
-          <div className="mb-6 flex justify-center">
-            <Link
-              href="/history"
-              className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-5 py-2 text-sm font-semibold text-blue-700 shadow-sm transition hover:border-blue-300 hover:bg-blue-50"
-            >
-              View History
-            </Link>
-          </div>
+         
           <div className="flex justify-center mb-6">
             <div className="bg-white p-4 rounded-2xl shadow-lg border border-slate-200">
               <img

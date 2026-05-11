@@ -29,13 +29,6 @@ const templateLabels: Record<string, string> = {
   linkedin: "LinkedIn Follow-up",
 };
 
-const statusLabels: Record<string, string> = {
-  all: "All statuses",
-  pending: "Pending",
-  sent: "Sent",
-  failed: "Failed",
-};
-
 function formatDate(dateString: string | null) {
   if (!dateString) return "Unknown date";
   return new Date(dateString).toLocaleString("en-IN", {
@@ -56,8 +49,8 @@ export default function HistoryPage() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [template, setTemplate] = useState("all");
-  const [status, setStatus] = useState("all");
   const [selectedCc, setSelectedCc] = useState<string[]>([]);
+  const [olderThanMonth, setOlderThanMonth] = useState(false);
   const [sort, setSort] = useState("desc");
 
   useEffect(() => {
@@ -70,8 +63,8 @@ export default function HistoryPage() {
         const params = new URLSearchParams();
         if (search.trim()) params.set("q", search.trim());
         if (template !== "all") params.set("template", template);
-        if (status !== "all") params.set("status", status);
         selectedCc.forEach((cc) => params.append("cc", cc));
+        if (olderThanMonth) params.set("olderThanMonth", "1");
         if (sort !== "desc") params.set("sort", sort);
 
         const response = await fetch(`/api/history?${params.toString()}`, {
@@ -85,9 +78,10 @@ export default function HistoryPage() {
         }
 
         setItems(Array.isArray(data?.items) ? data.items : []);
-      } catch (fetchError: any) {
-        if (fetchError?.name === "AbortError") return;
-        setError(fetchError?.message || "Failed to load history");
+      } catch (fetchError: unknown) {
+        if (fetchError instanceof DOMException && fetchError.name === "AbortError") return;
+        const message = fetchError instanceof Error ? fetchError.message : "Failed to load history";
+        setError(message);
         setItems([]);
       } finally {
         setLoading(false);
@@ -98,7 +92,7 @@ export default function HistoryPage() {
       controller.abort();
       window.clearTimeout(timeout);
     };
-  }, [search, selectedCc, sort, status, template]);
+  }, [olderThanMonth, search, selectedCc, sort, template]);
 
   const availableCc = useMemo(() => {
     return Array.from(new Set(items.flatMap((item) => item.cc))).sort((a, b) => a.localeCompare(b));
@@ -127,7 +121,7 @@ export default function HistoryPage() {
             </div>
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Sent mail archive</h1>
             <p className="mt-2 max-w-2xl text-sm text-slate-600">
-              Search sent emails, filter by template, status, or CC recipients, and review delivery metadata in one place.
+              Search sent emails, filter by template, age, or CC recipients, and review delivery metadata in one place.
             </p>
           </div>
 
@@ -186,18 +180,18 @@ export default function HistoryPage() {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">Status</label>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+              <label className="mb-2 block text-sm font-medium text-slate-700">Age Filter</label>
+              <button
+                type="button"
+                onClick={() => setOlderThanMonth((current) => !current)}
+                className={`w-full rounded-xl border px-4 py-3 text-left text-sm font-semibold transition ${
+                  olderThanMonth
+                    ? "border-blue-600 bg-blue-600 text-white"
+                    : "border-slate-300 bg-slate-50 text-slate-700 hover:border-blue-300 hover:bg-blue-50"
+                }`}
               >
-                {Object.entries(statusLabels).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
+                {olderThanMonth ? "Showing mail older than 1 month" : "More than a month old"}
+              </button>
             </div>
 
             <div>
