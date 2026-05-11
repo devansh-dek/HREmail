@@ -1,5 +1,6 @@
 // @ts-ignore: no declaration file for 'nodemailer' in this project
 import nodemailer from "nodemailer";
+import { getDatabase } from "@/lib/mongodb";
 
 // HTML escaping function
 function escapeHtml(text: string) {
@@ -183,22 +184,70 @@ export async function POST(req: Request) {
     const randomString = Math.random().toString(36).substring(2, 15);
     const messageId = `<${timestamp}.${randomString}@iiitranchi.ac.in>`;
 
-    await transporter.sendMail({
-      from: `"IIIT Ranchi - Placement" <${process.env.EMAIL_ADDRESS}>`,
-      to: email,
-      cc: ccList,
+    const db = await getDatabase();
+    const historyCollection = db.collection("email_history");
+    const historyInsert = await historyCollection.insertOne({
+      status: "pending",
+      recipientName: name,
+      companyName,
+      email,
+      template: tpl,
       subject,
-      html: htmlBody,
-      headers: {
-        'Message-ID': messageId,
-        'X-Entity-Ref-ID': messageId,
-      },
+      cc: ccList,
+      selectedContacts: Array.isArray(selectedContacts)
+        ? selectedContacts.map((s: any) => String(s).trim()).filter((s: string) => s)
+        : [],
+      previousInteraction: previousInteraction ? String(previousInteraction) : "",
+      alumnusName: alumnusName ? String(alumnusName) : "",
+      roleName: roleName ? String(roleName) : "",
+      messageId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
+
+    try {
+      await transporter.sendMail({
+        from: `"IIIT Ranchi - Placement" <${process.env.EMAIL_ADDRESS}>`,
+        to: email,
+        cc: ccList,
+        subject,
+        html: htmlBody,
+        headers: {
+          "Message-ID": messageId,
+          "X-Entity-Ref-ID": messageId,
+        },
+      });
+
+      await historyCollection.updateOne(
+        { _id: historyInsert.insertedId },
+        {
+          $set: {
+            status: "sent",
+            sentAt: new Date(),
+            updatedAt: new Date(),
+          },
+        }
+      );
+    } catch (sendError: any) {
+      await historyCollection.updateOne(
+        { _id: historyInsert.insertedId },
+        {
+          $set: {
+            status: "failed",
+            errorMessage: sendError?.message || String(sendError),
+            updatedAt: new Date(),
+          },
+        }
+      );
+
+      throw sendError;
+    }
 
     return new Response(
       JSON.stringify({
         message: "✅ Email sent successfully",
         recipient: { email, companyName, name },
+        historyId: historyInsert.insertedId.toString(),
       }),
       { status: 200 }
     );

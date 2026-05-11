@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "HR Mailer",
-  description: "Created to mail hrs efficiently",
+  description: "Created to mail HRs efficiently and track email history",
 };
 
 export default function RootLayout({
