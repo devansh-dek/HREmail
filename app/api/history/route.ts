@@ -6,6 +6,16 @@ function toSafeString(value: unknown) {
   return typeof value === "string" ? value : value == null ? "" : String(value);
 }
 
+function toIsoDateString(value: unknown): string | null {
+  if (value == null) return null;
+  if (value instanceof Date) return value.toISOString();
+  if (typeof value === "string" || typeof value === "number") {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date.toISOString();
+  }
+  return null;
+}
+
 function escapeRegex(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -38,9 +48,9 @@ function serializeRecord(record: HistoryRecord) {
     cc: Array.isArray(record.cc) ? record.cc.map((item: unknown) => toSafeString(item)).filter(Boolean) : [],
     messageId: toSafeString(record.messageId),
     errorMessage: toSafeString(record.errorMessage),
-    createdAt: record.createdAt ? new Date(record.createdAt).toISOString() : null,
-    sentAt: record.sentAt ? new Date(record.sentAt).toISOString() : null,
-    updatedAt: record.updatedAt ? new Date(record.updatedAt).toISOString() : null,
+    createdAt: toIsoDateString(record.createdAt),
+    sentAt: toIsoDateString(record.sentAt),
+    updatedAt: toIsoDateString(record.updatedAt),
   };
 }
 
