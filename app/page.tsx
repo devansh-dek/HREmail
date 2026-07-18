@@ -35,6 +35,7 @@ export default function Home() {
     { email: "abhinav.2023ug2075@iiitranchi.ac.in", name: "Abhinav" },
     { email: "devansh.2023ug1058@iiitranchi.ac.in", name: "Devansh" },
     { email: "aman.2023ug1047@iiitranchi.ac.in", name: "Aman" },
+    { email: "pranjal.2024ug4019@iiitranchi.ac.in", name: "Pranjal" },
   ];
   const templates = [
     { id: "normal", label: "Normal Invitation (default)" },
