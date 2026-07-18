@@ -380,6 +380,13 @@ export default function Home() {
                   Open History
                 </Link>
 
+                <Link
+                  href="/follow-ups"
+                  className="px-6 py-3 text-center text-orange-800 font-semibold rounded-lg border border-orange-300 bg-gradient-to-r from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 transition-colors shadow-sm"
+                >
+                  Follow-ups (30+ days)
+                </Link>
+
                 <button
                   type="button"
                   onClick={handleSubmit}

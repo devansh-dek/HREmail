@@ -113,7 +113,8 @@ export async function POST(req: Request) {
       );
     }
 
-    const smtpPort = Number(process.env.SMTP_PORT) || 587;
+    // Default to 465 (implicit TLS): STARTTLS on 587 fails from some serverless hosts (SSL alert 80)
+    const smtpPort = Number(process.env.SMTP_PORT) || 465;
     // Trim credentials to avoid hidden whitespace mistakes
     const smtpUser = process.env.EMAIL_ADDRESS?.toString().trim();
     const smtpPass = process.env.EMAIL_PASSWORD?.toString().trim();
