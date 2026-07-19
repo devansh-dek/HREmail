@@ -26,7 +26,7 @@ function createEmailBody(name: string, companyName: string,finalPOC1Name: string
 
     <p>We are delighted to invite your esteemed organization <strong>${escapeHtml(
       companyName
-    )}</strong> to participate in the <strong>Placement/Internship drive</strong> of the Institute for the academic session <strong>2025-2026</strong>.catering to eligible students from <strong>Batch 2026 (final year placements)</strong> and <strong>Batch 2027 (internship opportunities)</strong>.</p>
+    )}</strong> to participate in the <strong>Campus Placement Drive</strong> of the Institute for the academic session <strong>2026–27</strong>.</p>
 
     <p>Established in <strong>2016</strong>, <strong>IIIT Ranchi</strong> is a premier institute of national importance, created as part of a visionary initiative by the <strong>Ministry of Education, Government of India</strong>. With a focus on bridging academia and industry, <strong>IIIT Ranchi</strong> has rapidly become a hub of innovation, excellence, and future-ready talent, shaping the next generation of engineers and technologists.</p>
 
@@ -39,11 +39,11 @@ function createEmailBody(name: string, companyName: string,finalPOC1Name: string
     <li>Achieving outstanding placement outcomes - with the </strong> highest package for the batch graduating in 2025 reaching ₹54 LPA</strong>.</li>
     </ul>
 
-    <p>To facilitate your participation, we kindly request you to complete the attached <strong><a href="https://docs.google.com/forms/d/e/1FAIpQLSceAnAp4n1QLqntnxTNrU-nqcCSLhRCuSY7X8zYtHjcNWjoYw/viewform">Job Notification Form</a></strong> with your requirements and offerings. The <strong>Training and Placement Cell</strong> will schedule the placement process as per the criteria outlined in our <strong>Placement Policy</strong>.</p>
+    <p>To facilitate your participation, we kindly request you to complete the attached <strong><a href="https://docs.google.com/forms/d/e/1FAIpQLSdRnf_Cm3G3xEhAVF-EXeH8vVQecfJzqVkOjRS1KrDtEYQITA/viewform">Job Notification Form</a></strong> with your requirements and offerings. The <strong>Training and Placement Cell</strong> will schedule the placement process as per the criteria outlined in our <strong>Placement Policy</strong>.</p>
 
     <p>For more information about our programs, achievements, and policies, please refer to the attached <strong>Placement Brochure</strong>.</p>
 
-    <p><strong>Placement Brochure:</strong> <a href="https://drive.google.com/file/d/18ntmXdNZYB9R-KxZ5l7eKl7fzuL7bItO/view">View Brochure</a><br>
+    <p><strong>Placement Brochure:</strong> <a href="https://drive.google.com/file/d/15IOLmr7IG3XTR3VbIHNa9L1gvaJjcr6i/view">View Brochure</a><br>
 
     <p>If you need any assistance or information, please reach out to our student coordinators. We'd be more than happy to assist.</p>
 
@@ -156,15 +156,15 @@ export async function POST(req: Request) {
 
     // Build subject and html based on selected template
     const tpl = (template || "normal").toString();
-    let subject = "Invitation to Participate in IIIT Ranchi's 2025-26 Campus Placement Drive";
+    let subject = "Invitation to Participate in IIIT Ranchi's 2026–27 Campus Placement Drive";
     let htmlBody = createEmailBody(name, companyName, finalPOC1Name, finalPOC1Phone, finalPOC2Name, finalPOC2Phone);
 
     if (tpl === "followup") {
-      subject = `Following up on our discussion: IIIT Ranchi Placement Drive 2025-26`;
+      subject = `Following up on our discussion: IIIT Ranchi Placement Drive 2026–27`;
       const ctx = previousInteraction ? ` ${escapeHtml(previousInteraction)}` : "";
       htmlBody = `<p>It was a pleasure speaking with you${ctx}.</p>\n` + htmlBody;
     } else if (tpl === "reengage") {
-      subject = `Continuing our Partnership: IIIT Ranchi Placement Drive 2025-26 & ${companyName}`;
+      subject = `Continuing our Partnership: IIIT Ranchi Placement Drive 2026–27 & ${companyName}`;
       htmlBody = `<p>We have had the privilege of collaborating with <strong>${escapeHtml(companyName)}</strong> for our past placement drives, and we would be delighted to continue this relationship.</p>\n` + htmlBody;
     } else if (tpl === "alumnus") {
       subject = `IIIT Ranchi TAP Coordinator - Request for ${companyName} Partnership`;
@@ -176,7 +176,7 @@ export async function POST(req: Request) {
       htmlBody = `<p>I noticed that <strong>${escapeHtml(companyName)}</strong> is hiring for <strong>${role}</strong>. We have students who are an excellent match and can be considered for this opening.</p>\n` + htmlBody;
     } else if (tpl === "linkedin") {
       const ctx = previousInteraction ? ` ${escapeHtml(previousInteraction)}` : "";
-      subject = `Following up on our LinkedIn conversation: IIIT Ranchi Placement Drive 2025-26`;
+      subject = `Following up on our LinkedIn conversation: IIIT Ranchi Placement Drive 2026–27`;
       htmlBody = `<p>Following up on our LinkedIn conversation${ctx}.</p>\n` + htmlBody;
     }
 
