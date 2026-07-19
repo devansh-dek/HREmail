@@ -36,7 +36,7 @@ function createEmailBody(name: string, companyName: string,finalPOC1Name: string
     <li>Excelling in <strong>Google Summer of Code (GSoC'25)</strong> where <strong>two students from the 2026 batch and one student from the 2027 batch</strong>, were selected.</li>
     <li>Representing the institute in <strong>ICPC 2025 and 2024, with teams securing ranks 19, 33, 48, 64, and 66</strong> in the <strong>Amritapuri, Chennai, and Kanpur regionals</strong>, continuing our legacy of strong competitive programming representation.</li>
     <li>Demonstrating exceptional skills in competitive programming, with numerous students earning <strong>Specialist, Expert, and Candidate Master</strong> rankings on <strong>Codeforces</strong>, and <strong>6-star, 5-star, and 4-star</strong> rankings on <strong>CodeChef</strong>.</li>
-    <li>Achieving outstanding placement outcomes - with the </strong> highest package for the batch graduating in 2025 reaching ₹54 LPA</strong>.</li>
+    <li>Achieving outstanding placement outcomes - with the </strong> highest package for the batch graduating in 2026 reaching ₹60 LPA</strong>.</li>
     </ul>
 
     <p>To facilitate your participation, we kindly request you to complete the attached <strong><a href="https://docs.google.com/forms/d/e/1FAIpQLSdRnf_Cm3G3xEhAVF-EXeH8vVQecfJzqVkOjRS1KrDtEYQITA/viewform">Job Notification Form</a></strong> with your requirements and offerings. The <strong>Training and Placement Cell</strong> will schedule the placement process as per the criteria outlined in our <strong>Placement Policy</strong>.</p>
